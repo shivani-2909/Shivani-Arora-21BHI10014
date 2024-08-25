@@ -1,0 +1,61 @@
+#game-board {
+    border-collapse: collapse;
+  }
+  
+  #game-board td {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    text-align: center;
+  }
+  
+  #move-history {
+    padding: 20px;
+  }
+  
+  #make-move-btn {
+    margin-top: 20px;
+  }
+  .piece {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ccc;
+    cursor: pointer;
+  }
+  
+  .piece.p1 {
+    background-color: #f00;
+  }
+  
+  .piece.p2 {
+    background-color: #0f0;
+  }
+  
+  .piece.h1 {
+    background-color: #ff0;
+  }
+  
+  .piece.h2 {
+    background-color: #0ff;
+  }
+  
+  .piece.h3 {
+    background-color: #f0f;
+  }
+  
+  .animate {
+    animation: move-animation 0.5s ease-in-out;
+  }
+  
+  @keyframes move-animation {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
