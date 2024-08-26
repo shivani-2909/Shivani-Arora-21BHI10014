@@ -1,17 +1,40 @@
 body {
-    background-color: rgb(80, 77, 77);
-    color: white; /* Default text color for the whole page */
-    font-family: Arial, sans-serif; /* Optional: improves text readability */
+    background-color: #2c3e50;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.game-container {
+    text-align: center;
+}
+
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #ecf0f1;
+}
+
+.board-container {
+    background: url('https://i.pinimg.com/originals/29/9e/25/299e25f7b3db9cc0a6720635c8a15e0c.jpg') no-repeat center center;
+    background-size: cover;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .container {
     display: grid;
     grid-template-columns: repeat(5, 80px);
     grid-template-rows: repeat(5, 80px);
-    gap: 0;
-    justify-content: center;
-    margin: 20px auto;
-    border: 2px solid black;
+    gap: 2px;
+    background-color: #34495e;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .box {
@@ -20,45 +43,66 @@ body {
     align-items: center;
     font-size: 24px;
     font-weight: bold;
-    color: whitesmoke; /* Default text color for boxes */
-}
-
-.box:nth-child(odd) {
-    background-color: rgb(94, 54, 15); /* Darker grey for the odd boxes */
+    color: #ecf0f1;
+    background-color: rgba(52, 73, 94, 0.8);
+    transition: all 0.3s ease;
 }
 
 .box:nth-child(even) {
-    background-color: rgb(94, 54, 15); /* Even darker grey for the even boxes */
+    background-color: rgba(44, 62, 80, 0.8);
 }
 
 .box.selected {
-    border: 2px solid #ff6a00;
+    border: 2px solid #e74c3c;
 }
 
 .box.highlight {
-    background-color: red;
+    background-color: rgb(176,255,226);
 }
 
-.box[data-player="A"] {
-    color: red; /* Red text for Player A */
-}
-
-.box[data-player="B"] {
-    color: darkblue; /* Dark blue text for Player B */
-}
-
-.allimg {
+.allimg, .allpawn {
     width: 50px;
     height: 50px;
+    transition: transform 0.3s ease;
 }
 
-.allpawn {
-    width: 40px;
-    height: 40px;
+.allimg:hover, .allpawn:hover {
+    transform: scale(1.1);
 }
 
 .turn-indicator {
     margin-top: 20px;
     font-size: 24px;
-    color: #fff; /* White color for the turn indicator */
+    color: #ecf0f1;
+    background-color: #34495e;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.move-history {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(52, 73, 94, 0.9);
+    padding: 15px;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    width: 200px;
+}
+
+.move-history h3 {
+    margin-top: 0;
+    color: #ecf0f1;
+}
+
+.move-history ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.move-history li {
+    margin-bottom: 5px;
+    color: #bdc3c7;
 }
