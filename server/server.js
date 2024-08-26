@@ -15,7 +15,8 @@ const initialPositions = {
 
 let gameState = {
     pieces: { ...initialPositions },
-    turn: 'A'
+    turn: 'A',
+    moveHistory: []
 };
 
 app.use(express.static(path.join(__dirname, '../client')));
@@ -37,32 +38,51 @@ wss.on('connection', (ws) => {
 
 function handleMove(data, ws) {
     const { from, to } = data;
-    const piece = gameState.pieces[from];
-    
-    if (!piece || !isValidMove(piece, from, to)) return;
+    const [fromRow, fromCol] = from.split('-').map(Number);
+    const [toRow, toCol] = to.split('-').map(Number);
 
-    if (!isMoveAllowed(from, to)) return;
+    const piece = Object.keys(gameState.pieces).find(key =>
+        gameState.pieces[key][0] === fromRow &&
+        gameState.pieces[key][1] === fromCol
+    );
 
-    gameState.pieces[to] = gameState.pieces[from];
-    delete gameState.pieces[from];
+    if (!piece || piece[0] !== gameState.turn || !isValidMove(piece, fromRow, fromCol, toRow, toCol)) {
+        ws.send(JSON.stringify({ type: 'INVALID_MOVE' }));
+        return;
+    }
+
+    // Execute the move
+    gameState.pieces[piece] = [toRow, toCol];
+
+    // Check for capture
+    const capturedPiece = Object.keys(gameState.pieces).find(key =>
+        key !== piece &&
+        gameState.pieces[key][0] === toRow &&
+        gameState.pieces[key][1] === toCol
+    );
+
+    if (capturedPiece) {
+        delete gameState.pieces[capturedPiece];
+    }
+
+    const lastMove = `${piece} ${from} to ${to}${capturedPiece ? ' capturing ' + capturedPiece : ''}`;
+    gameState.moveHistory.push(lastMove);
     gameState.turn = gameState.turn === 'A' ? 'B' : 'A';
 
     const winner = checkWin();
     if (winner) {
-        broadcast({ type: 'WIN', message: winner });
+        broadcast({ type: 'WIN', message: `${winner} Wins!`, state: gameState, lastMove });
     } else {
-        broadcast({ type: 'UPDATE', state: gameState });
+        broadcast({ type: 'UPDATE', state: gameState, lastMove });
     }
 }
 
-function isValidMove(piece, from, to) {
+function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
     const pieceType = piece.split('-')[1];
-    const [fromRow, fromCol] = from.split('-').map(Number);
-    const [toRow, toCol] = to.split('-').map(Number);
     const rowDiff = Math.abs(toRow - fromRow);
     const colDiff = Math.abs(toCol - fromCol);
 
-    if (toRow === fromRow) return false;
+    if (toRow === fromRow) return false; // Can't move onto own starting line
 
     switch (pieceType) {
         case 'P1':
@@ -72,28 +92,33 @@ function isValidMove(piece, from, to) {
         case 'H1':
             return (rowDiff === 2 && colDiff === 0) || (rowDiff === 0 && colDiff === 2);
         case 'H2':
-            return (rowDiff === 2 && colDiff === 2);
+            return rowDiff === 2 && colDiff === 2;
         default:
             return false;
     }
 }
 
-function isMoveAllowed(from, to) {
-    const fromPiece = gameState.pieces[from];
-    const toPiece = gameState.pieces[to];
+function checkWin() {
+    const playerAPieces = Object.keys(gameState.pieces).filter(piece => piece.startsWith('A-'));
+    const playerBPieces = Object.keys(gameState.pieces).filter(piece => piece.startsWith('B-'));
 
-    if (!toPiece) return true;
+    if (playerAPieces.length === 0) return 'Player B';
+    if (playerBPieces.length === 0) return 'Player A';
 
-    const fromPieceTeam = fromPiece[0];
-    const toPieceTeam = toPiece[0];
+    const playerAWin = playerAPieces.some(piece => gameState.pieces[piece][0] === 4);
+    const playerBWin = playerBPieces.some(piece => gameState.pieces[piece][0] === 0);
 
-    return toPieceTeam !== fromPieceTeam;
+    if (playerAWin) return 'Player A';
+    if (playerBWin) return 'Player B';
+
+    return null;
 }
 
 function resetGame() {
     gameState = {
         pieces: { ...initialPositions },
-        turn: 'A'
+        turn: 'A',
+        moveHistory: []
     };
 }
 
@@ -105,16 +130,8 @@ function broadcast(message) {
     });
 }
 
-function checkWin() {
-    const playerAPieces = Object.keys(gameState.pieces).some(piece => piece.startsWith('A-'));
-    const playerBPieces = Object.keys(gameState.pieces).some(piece => piece.startsWith('B-'));
-
-    if (!playerAPieces) return 'Player B Wins!';
-    if (!playerBPieces) return 'Player A Wins!';
-    return null;
-}
-
 server.listen(5500, () => {
     console.log('Server is listening on port 5500');
     open('http://localhost:5500');
 });
+
