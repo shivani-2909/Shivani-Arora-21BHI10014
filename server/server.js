@@ -52,64 +52,93 @@ function handleMove(data, ws) {
     }
 
     // Execute the move
-    gameState.pieces[piece] = [toRow, toCol];
+    const capturedPieces = movePiece(piece, toRow, toCol);
 
-    // Check for capture
-    const capturedPiece = Object.keys(gameState.pieces).find(key =>
-        key !== piece &&
-        gameState.pieces[key][0] === toRow &&
-        gameState.pieces[key][1] === toCol
-    );
-
-    if (capturedPiece) {
-        delete gameState.pieces[capturedPiece];
-    }
-
-    const lastMove = `${piece} ${from} to ${to}${capturedPiece ? ' capturing ' + capturedPiece : ''}`;
+    const lastMove = `${piece} ${from} to ${to}${capturedPieces.length > 0 ? ' capturing ' + capturedPieces.join(', ') : ''}`;
     gameState.moveHistory.push(lastMove);
     gameState.turn = gameState.turn === 'A' ? 'B' : 'A';
 
     const winner = checkWin();
     if (winner) {
-        broadcast({ type: 'WIN', message: `${winner} Wins!`, state: gameState, lastMove });
+        broadcast({ type: 'WIN', message: `Player ${winner} Wins!`, state: gameState, lastMove });
     } else {
         broadcast({ type: 'UPDATE', state: gameState, lastMove });
     }
 }
 
 function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
-    const pieceType = piece.split('-')[1];
-    const rowDiff = Math.abs(toRow - fromRow);
-    const colDiff = Math.abs(toCol - fromCol);
+  const pieceType = piece.split('-')[1][0];
+  const rowDiff = toRow - fromRow;
+  const colDiff = toCol - fromCol;
 
-    if (toRow === fromRow) return false; // Can't move onto own starting line
+  // Check if the destination is occupied by a friendly piece
+  const destPiece = Object.keys(gameState.pieces).find(key =>
+      gameState.pieces[key][0] === toRow &&
+      gameState.pieces[key][1] === toCol
+  );
+  if (destPiece && destPiece[0] === piece[0]) return false;
 
-    switch (pieceType) {
-        case 'P1':
-        case 'P2':
-        case 'P3':
-            return (rowDiff === 1 && colDiff <= 1) || (rowDiff <= 1 && colDiff === 1);
-        case 'H1':
-            return (rowDiff === 2 && colDiff === 0) || (rowDiff === 0 && colDiff === 2);
-        case 'H2':
-            return rowDiff === 2 && colDiff === 2;
-        default:
-            return false;
+  switch (pieceType) {
+      case 'P':
+          // Pawn moves one block in any direction (Left, Right, Forward, or Backward)
+          return (Math.abs(rowDiff) === 1 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 1);
+      case 'H':
+          if (piece.endsWith('1')) {
+              return (Math.abs(rowDiff) === 2 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 2);
+          } else if (piece.endsWith('2')) {
+              return Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2;
+          }
+  }
+  return false;
+}
+
+function movePiece(piece, toRow, toCol) {
+    const [fromRow, fromCol] = gameState.pieces[piece];
+    const pieceType = piece.split('-')[1][0];
+    const capturedPieces = [];
+
+    if (pieceType === 'H') {
+        const rowStep = Math.sign(toRow - fromRow);
+        const colStep = Math.sign(toCol - fromCol);
+        let currentRow = fromRow + rowStep;
+        let currentCol = fromCol + colStep;
+
+        while (currentRow !== toRow || currentCol !== toCol) {
+            const capturedPiece = Object.keys(gameState.pieces).find(key =>
+                gameState.pieces[key][0] === currentRow &&
+                gameState.pieces[key][1] === currentCol &&
+                key[0] !== piece[0]
+            );
+            if (capturedPiece) {
+                delete gameState.pieces[capturedPiece];
+                capturedPieces.push(capturedPiece);
+            }
+            currentRow += rowStep;
+            currentCol += colStep;
+        }
     }
+
+    const capturedPiece = Object.keys(gameState.pieces).find(key =>
+        gameState.pieces[key][0] === toRow &&
+        gameState.pieces[key][1] === toCol &&
+        key[0] !== piece[0]
+    );
+
+    if (capturedPiece) {
+        delete gameState.pieces[capturedPiece];
+        capturedPieces.push(capturedPiece);
+    }
+
+    gameState.pieces[piece] = [toRow, toCol];
+    return capturedPieces;
 }
 
 function checkWin() {
     const playerAPieces = Object.keys(gameState.pieces).filter(piece => piece.startsWith('A-'));
     const playerBPieces = Object.keys(gameState.pieces).filter(piece => piece.startsWith('B-'));
 
-    if (playerAPieces.length === 0) return 'Player B';
-    if (playerBPieces.length === 0) return 'Player A';
-
-    const playerAWin = playerAPieces.some(piece => gameState.pieces[piece][0] === 4);
-    const playerBWin = playerBPieces.some(piece => gameState.pieces[piece][0] === 0);
-
-    if (playerAWin) return 'Player A';
-    if (playerBWin) return 'Player B';
+    if (playerAPieces.length === 0) return 'B';
+    if (playerBPieces.length === 0) return 'A';
 
     return null;
 }
@@ -134,4 +163,3 @@ server.listen(5500, () => {
     console.log('Server is listening on port 5500');
     open('http://localhost:5500');
 });
-

@@ -50,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateMoveHistory(lastMove) {
         if (lastMove) {
-            const moveList = document.getElementById('moveList');
             const moveItem = document.createElement('li');
             moveItem.textContent = lastMove;
             moveList.appendChild(moveItem);
@@ -135,7 +134,10 @@ document.addEventListener('DOMContentLoaded', function () {
         boxes.forEach(targetBox => {
             const [targetRow, targetCol] = targetBox.id.slice(1).split('').map(Number);
             if (isValidMove(piece, row, col, targetRow, targetCol)) {
-                targetBox.classList.add('highlight');
+                const targetPiece = targetBox.getAttribute('data-piece');
+                if (!targetPiece || targetPiece[0] !== turn) {
+                    targetBox.classList.add('highlight');
+                }
             }
         });
     }
@@ -145,24 +147,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
-        const pieceType = piece.split('-')[1];
-        const rowDiff = Math.abs(toRow - fromRow);
-        const colDiff = Math.abs(toCol - fromCol);
-
-        if (toRow === fromRow) return false;
-
+        const pieceType = piece.split('-')[1][0];
+        const rowDiff = toRow - fromRow;
+        const colDiff = toCol - fromCol;
+    
         switch (pieceType) {
-            case 'P1':
-            case 'P2':
-            case 'P3':
-                return (rowDiff === 1 && colDiff <= 1) || (rowDiff <= 1 && colDiff === 1);
-            case 'H1':
-                return (rowDiff === 2 && colDiff === 0) || (rowDiff === 0 && colDiff === 2);
-            case 'H2':
-                return (rowDiff === 2 && colDiff === 2);
-            default:
-                return false;
+            case 'P':
+                // Pawn moves one block in any direction (Left, Right, Forward, or Backward)
+                return (Math.abs(rowDiff) === 1 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 1);
+            case 'H':
+                if (piece.endsWith('1')) {
+                    return (Math.abs(rowDiff) === 2 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 2);
+                } else if (piece.endsWith('2')) {
+                    return Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2;
+                }
         }
+        return false;
     }
 });
-
