@@ -78,7 +78,8 @@ After each move, the game will update the move history. The move history will di
 
 ### Winning the Game
 - The game is won when one player captures all of their opponent's pieces. The game will automatically end and display a message indicating the winner.
-- It will display the button to start again.
+- It will display the button for "New Game".
+  
   ![Winner_StartNewGame](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Player%20A-wins.PNG)
 
 
