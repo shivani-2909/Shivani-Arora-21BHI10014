@@ -1,61 +1,77 @@
-#game-board {
-    border-collapse: collapse;
-  }
-  
-  #game-board td {
-    width: 50px;
-    height: 50px;
-    border: 1px solid black;
-    text-align: center;
-  }
-  
-  #move-history {
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
     padding: 20px;
-  }
-  
-  #make-move-btn {
-    margin-top: 20px;
-  }
-  .piece {
-    width: 50px;
-    height: 50px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    grid-gap: 2px;
+    margin-bottom: 20px;
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.cell:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.cell:nth-child(even) {
+    background-color: #fff;
+}
+
+.character {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
-    background-color: #ccc;
-    cursor: pointer;
-  }
-  
-  .piece.p1 {
-    background-color: #f00;
-  }
-  
-  .piece.p2 {
-    background-color: #0f0;
-  }
-  
-  .piece.h1 {
-    background-color: #ff0;
-  }
-  
-  .piece.h2 {
-    background-color: #0ff;
-  }
-  
-  .piece.h3 {
-    background-color: #f0f;
-  }
-  
-  .animate {
-    animation: move-animation 0.5s ease-in-out;
-  }
-  
-  @keyframes move-animation {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.2);
-    }
-    100% {
-      transform: scale(1);
-    }
-  }
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.Pawn {
+    background-color: blue;
+}
+
+.Hero1 {
+    background-color: red;
+}
+
+.Hero2 {
+    background-color: green;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#controls label {
+    margin-right: 10px;
+}
+
+#controls select,
+#controls button {
+    margin: 5px 0;
+}
