@@ -36,7 +36,7 @@ This is a custom chess-like game played on a 5x5 grid with unique piece movement
 ### Game Setup
 - The game is played between two players on a 5x5 grid.
 - Each player controls a team of 5 characters, which can include Pawns, Hero1, and Hero2.
-- Players arrange their characters on their respective starting rows at the beginning of the game.
+  ![Game Board Screenshot]((https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true))
 
 ### Characters and Movement
 There are three types of characters available:
@@ -51,25 +51,32 @@ There are three types of characters available:
    - Moves two blocks diagonally in any direction.
    - Kills any opponent's character in its path.
    - Move commands: FL (Forward-Left), FR (Forward-Right), BL (Backward-Left), BR (Backward-Right).
+  
+### Selecting a Piece
+When you select a piece, its border will be highlighted in:
 
-### Move Command Format
-- All moves are relative to the player's perspective.
-- For Pawn and Hero1: `<character_name>:<move>` (e.g., `P1:L`, `H1:F`).
-- For Hero2: `<character_name>:<move>` (e.g., `H2:FL`, `H2:BR`).
+- Red for Player A's pieces
+- Blue for Player B's pieces
+- The possible moves for the selected piece will be highlighted on the board. If you try to move a piece to an invalid location, a pop-up will appear indicating that the move is not allowed.
 
-### Game Flow
-1. **Initial Setup:**
-   - Players deploy all 5 characters on their starting row in any order.
-   - Character positions are input as a list of character names, placed from left to right.
-   - Players can choose any combination of Pawns, Hero1, and Hero2 for their team.
+### Making a Move
+- To make a move, simply click on the piece you want to move and then click on the destination square. If the move is valid, the piece will be moved to the new location. If the move is invalid, a pop-up will appear indicating that the move is not allowed.
 
-## Game Screenshots
+### Capturing an Opponent's Piece
+- If a piece lands on a square occupied by an opponent's piece, the opponent's piece will be captured and removed from the board. 
 
-![Game Board Screenshot](path/to/screenshot.png)
+### Move History
+After each move, the game will update the move history. The move history will display the following information:
 
-## Move History
+1. The piece that was moved
+2. The starting and ending coordinates of the move
+3. The type of move made (e.g. " A-H1 0-2 to 2-2")
+4. If a piece was captured, the type of piece captured and its coordinates (e.g. " A-H1 2-2 to 4-2 capturing B-H1")
 
-![Move History Screenshot](path/to/move-history.png)
+### Winning the Game
+- The game is won when one player captures all of their opponent's pieces. The game will automatically end and display a message indicating the winner.
+- It will display the button to start again.
+
 
 ## Testing
 
