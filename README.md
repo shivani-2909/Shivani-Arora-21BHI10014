@@ -58,24 +58,29 @@ When you select a piece, its border will be highlighted in:
 - Red for Player A's pieces
 - Blue for Player B's pieces
 - The possible moves for the selected piece will be highlighted on the board. If you try to move a piece to an invalid location, a pop-up will appear indicating that the move is not allowed.
+    ![A's_Turn]([https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/A's%20turn.PNG))
+    ![B's Turn]([https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/B's%20turn.PNG))
 
 ### Making a Move
 - To make a move, simply click on the piece you want to move and then click on the destination square. If the move is valid, the piece will be moved to the new location. If the move is invalid, a pop-up will appear indicating that the move is not allowed.
+  ![Invalid_move]([[[https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/B's%20turn.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/move-history.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/invalid-move.PNG))
 
 ### Capturing an Opponent's Piece
-- If a piece lands on a square occupied by an opponent's piece, the opponent's piece will be captured and removed from the board. 
+- If a piece lands on a square occupied by an opponent's piece, the opponent's piece will be captured and removed from the board.
+  ![Last_move]([[[https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/B's%20turn.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/move-history.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Last-move.PNG))
 
 ### Move History
 After each move, the game will update the move history. The move history will display the following information:
-
 1. The piece that was moved
 2. The starting and ending coordinates of the move
 3. The type of move made (e.g. " A-H1 0-2 to 2-2")
 4. If a piece was captured, the type of piece captured and its coordinates (e.g. " A-H1 2-2 to 4-2 capturing B-H1")
+    ![Move_History]([[https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/B's%20turn.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/move-history.PNG))
 
 ### Winning the Game
 - The game is won when one player captures all of their opponent's pieces. The game will automatically end and display a message indicating the winner.
 - It will display the button to start again.
+  ![Winner_StartNewGame]([[[https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/B's%20turn.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/move-history.PNG)](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Player%20A-wins.PNG))
 
 
 ## Testing
