@@ -1,85 +1,120 @@
-import { WebSocketServer } from 'ws';
-import { GameState } from './gameState.js';
-import { calculateNewPosition, sendMoveResult } from './gameLogic.js';
+const http = require('http');
+const WebSocket = require('ws');
+const path = require('path');
+const express = require('express');
+const open = require('open');
 
-const wss = new WebSocketServer({ port: 8080 });
-let gameState = new GameState();
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-wss.on('connection', ws => {
-  console.log('Client connected');
-  gameState.clients.push(ws);
+const initialPositions = {
+    'A-P1': [0, 0], 'A-P2': [0, 1], 'A-H1': [0, 2], 'A-H2': [0, 3], 'A-P3': [0, 4],
+    'B-P1': [4, 0], 'B-P2': [4, 1], 'B-H1': [4, 2], 'B-H2': [4, 3], 'B-P3': [4, 4]
+};
 
-  ws.on('message', message => {
-    console.log(`Received message from client: ${message}`);
-    const [command, ...args] = message.split(' ');
+let gameState = {
+    pieces: { ...initialPositions },
+    turn: 'A'
+};
 
-    switch (command) {
-      case 'init':
-        gameState.initGame();
-        gameState.broadcastGameState();
-        break;
-      case 'move':
-        handleMove(ws, args[0], args[1]);
-        break;
-      case 'newGame':
-        startNewGame(ws);
-        break;
-      case 'quit':
-        quitGame(ws);
-        break;
-      default:
-        console.error(`Unknown message type: ${command}`);
-    }
-  });
+app.use(express.static(path.join(__dirname, '../client')));
 
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    gameState.clients = gameState.clients.filter(client => client !== ws);
-  });
+wss.on('connection', (ws) => {
+    console.log('Client connected');
+    ws.send(JSON.stringify({ type: 'INIT', state: gameState }));
 
-  ws.on('error', error => {
-    console.error(`Error occurred on WebSocket server: ${error}`);
-  });
+    ws.on('message', (message) => {
+        const data = JSON.parse(message);
+        if (data.type === 'MOVE') {
+            handleMove(data, ws);
+        } else if (data.type === 'RESET') {
+            resetGame();
+            broadcast({ type: 'INIT', state: gameState });
+        }
+    });
 });
 
-function handleMove(ws, characterId, move) {
-  const character = gameState.characters.find(character => character.id === characterId);
+function handleMove(data, ws) {
+    const { from, to } = data;
+    const piece = gameState.pieces[from];
+    
+    if (!piece || !isValidMove(piece, from, to)) return;
 
-  if (!character) {
-    sendMoveResult(ws, false, 'Character not found');
-    return;
-  }
+    if (!isMoveAllowed(from, to)) return;
 
-  try {
-    const newPosition = calculateNewPosition(character, move);
-    if (!newPosition || gameState.board[newPosition.y][newPosition.x] !== null) {
-      sendMoveResult(ws, false, 'Invalid move');
-      return;
-    }
+    gameState.pieces[to] = gameState.pieces[from];
+    delete gameState.pieces[from];
+    gameState.turn = gameState.turn === 'A' ? 'B' : 'A';
 
-    gameState.updateGameState(character, newPosition);
-    gameState.broadcastGameState();
-    const winner = gameState.checkForWin();
+    const winner = checkWin();
     if (winner) {
-      gameState.broadcastGameState();
-      ws.send(`gameOver ${winner}`);
+        broadcast({ type: 'WIN', message: winner });
+    } else {
+        broadcast({ type: 'UPDATE', state: gameState });
     }
-  } catch (error) {
-    console.error(`Error occurred while handling move: ${error}`);
-    sendMoveResult(ws, false, 'Error occurred while handling move');
-  }
 }
 
-function startNewGame(ws) {
-  gameState = new GameState(); // Re-initialize game state for a new game
-  gameState.initGame();
-  gameState.broadcastGameState();
-  console.log('New game started');
+function isValidMove(piece, from, to) {
+    const pieceType = piece.split('-')[1];
+    const [fromRow, fromCol] = from.split('-').map(Number);
+    const [toRow, toCol] = to.split('-').map(Number);
+    const rowDiff = Math.abs(toRow - fromRow);
+    const colDiff = Math.abs(toCol - fromCol);
+
+    if (toRow === fromRow) return false;
+
+    switch (pieceType) {
+        case 'P1':
+        case 'P2':
+        case 'P3':
+            return (rowDiff === 1 && colDiff <= 1) || (rowDiff <= 1 && colDiff === 1);
+        case 'H1':
+            return (rowDiff === 2 && colDiff === 0) || (rowDiff === 0 && colDiff === 2);
+        case 'H2':
+            return (rowDiff === 2 && colDiff === 2);
+        default:
+            return false;
+    }
 }
 
-function quitGame(ws) {
-  console.log('Client quit game');
-  ws.close();
+function isMoveAllowed(from, to) {
+    const fromPiece = gameState.pieces[from];
+    const toPiece = gameState.pieces[to];
+
+    if (!toPiece) return true;
+
+    const fromPieceTeam = fromPiece[0];
+    const toPieceTeam = toPiece[0];
+
+    return toPieceTeam !== fromPieceTeam;
 }
 
-console.log('WebSocket server started on port 8080');
+function resetGame() {
+    gameState = {
+        pieces: { ...initialPositions },
+        turn: 'A'
+    };
+}
+
+function broadcast(message) {
+    wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(message));
+        }
+    });
+}
+
+function checkWin() {
+    const playerAPieces = Object.keys(gameState.pieces).some(piece => piece.startsWith('A-'));
+    const playerBPieces = Object.keys(gameState.pieces).some(piece => piece.startsWith('B-'));
+
+    if (!playerAPieces) return 'Player B Wins!';
+    if (!playerBPieces) return 'Player A Wins!';
+    return null;
+}
+
+server.listen(5500, () => {
+    console.log('Server is listening on port 5500');
+    open('http://localhost:5500');
+});

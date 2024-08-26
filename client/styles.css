@@ -1,0 +1,64 @@
+body {
+    background-color: rgb(80, 77, 77);
+    color: white; /* Default text color for the whole page */
+    font-family: Arial, sans-serif; /* Optional: improves text readability */
+}
+
+.container {
+    display: grid;
+    grid-template-columns: repeat(5, 80px);
+    grid-template-rows: repeat(5, 80px);
+    gap: 0;
+    justify-content: center;
+    margin: 20px auto;
+    border: 2px solid black;
+}
+
+.box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: whitesmoke; /* Default text color for boxes */
+}
+
+.box:nth-child(odd) {
+    background-color: rgb(94, 54, 15); /* Darker grey for the odd boxes */
+}
+
+.box:nth-child(even) {
+    background-color: rgb(94, 54, 15); /* Even darker grey for the even boxes */
+}
+
+.box.selected {
+    border: 2px solid #ff6a00;
+}
+
+.box.highlight {
+    background-color: red;
+}
+
+.box[data-player="A"] {
+    color: red; /* Red text for Player A */
+}
+
+.box[data-player="B"] {
+    color: darkblue; /* Dark blue text for Player B */
+}
+
+.allimg {
+    width: 50px;
+    height: 50px;
+}
+
+.allpawn {
+    width: 40px;
+    height: 40px;
+}
+
+.turn-indicator {
+    margin-top: 20px;
+    font-size: 24px;
+    color: #fff; /* White color for the turn indicator */
+}
