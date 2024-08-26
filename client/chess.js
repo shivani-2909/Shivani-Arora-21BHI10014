@@ -1,12 +1,15 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // Get DOM elements
     const board = document.querySelector('.container');
     const boxes = Array.from(document.querySelectorAll('.box'));
     const moveList = document.getElementById('moveList');
     let selectedBox = null;
     let turn = 'A';
 
+    // Connect to WebSocket server
     const ws = new WebSocket('ws://localhost:5500');
 
+    // Handle messages from the server
     ws.addEventListener('message', function (event) {
         const data = JSON.parse(event.data);
         switch (data.type) {
@@ -28,6 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Initialize the game board
     function initializeBoard(state) {
         boxes.forEach(box => {
             box.textContent = '';
@@ -44,10 +48,12 @@ document.addEventListener('DOMContentLoaded', function () {
         updateMoveHistoryDisplay(state.moveHistory);
     }
 
+    // Update the board after a move
     function updateBoard(state) {
         initializeBoard(state);
     }
 
+    // Add a new move to the move history
     function updateMoveHistory(lastMove) {
         if (lastMove) {
             const moveItem = document.createElement('li');
@@ -57,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Update the entire move history display
     function updateMoveHistoryDisplay(moveHistory) {
         moveList.innerHTML = '';
         moveHistory.forEach((move, index) => {
@@ -67,6 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         moveList.scrollTop = moveList.scrollHeight;
     }
 
+    // Display the win message and new game button
     function displayWinMessage(message) {
         const winDialog = document.createElement('div');
         winDialog.className = 'win-dialog';
@@ -84,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Handle clicks on the game board
     board.addEventListener('click', function (event) {
         const clickedBox = event.target.closest('.box');
         if (!clickedBox) return;
@@ -112,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Select a box and highlight valid moves
     function selectBox(box) {
         selectedBox = box;
         box.classList.add('selected');
@@ -119,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
         highlightValidMoves(box);
     }
 
+    // Deselect the currently selected box
     function deselectBox() {
         if (selectedBox) {
             selectedBox.classList.remove('selected', 'selected-a', 'selected-b');
@@ -127,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Highlight valid moves for the selected piece
     function highlightValidMoves(box) {
         const piece = box.getAttribute('data-piece');
         const [row, col] = box.id.slice(1).split('').map(Number);
@@ -142,10 +154,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Clear all highlighted moves
     function clearHighlights() {
         boxes.forEach(box => box.classList.remove('highlight'));
     }
 
+    // Check if a move is valid for a given piece
     function isValidMove(piece, fromRow, fromCol, toRow, toCol) {
         const pieceType = piece.split('-')[1][0];
         const rowDiff = toRow - fromRow;
@@ -156,9 +170,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Pawn moves one block in any direction (Left, Right, Forward, or Backward)
                 return (Math.abs(rowDiff) === 1 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 1);
             case 'H':
+                // Hero moves two blocks in a specific direction depending on its type
                 if (piece.endsWith('1')) {
+                    // Hero1 moves two blocks straight in any direction (Left, Right, Forward, or Backward)
                     return (Math.abs(rowDiff) === 2 && colDiff === 0) || (rowDiff === 0 && Math.abs(colDiff) === 2);
                 } else if (piece.endsWith('2')) {
+                    // Hero2 moves two blocks diagonally in any direction
                     return Math.abs(rowDiff) === 2 && Math.abs(colDiff) === 2;
                 }
         }
