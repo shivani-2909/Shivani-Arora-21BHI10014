@@ -36,7 +36,7 @@ This is a custom chess-like game played on a 5x5 grid with unique piece movement
 ### Game Setup
 - The game is played between two players on a 5x5 grid.
 - Each player controls a team of 5 characters, which can include Pawns, Hero1, and Hero2.
-  ![Game Board Screenshot]((https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true))
+  ![Game Board Screenshot](https://github.com/shivani-2909/Shivani-Arora-21BHI10014/blob/main/images/Game-main-page.PNG?raw=true)
 
 ### Characters and Movement
 There are three types of characters available:
