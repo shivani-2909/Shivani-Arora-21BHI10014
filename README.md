@@ -99,4 +99,4 @@ To test the game on your local machine:
    - Capture opponent pieces.
    - Play until one player wins.
 
-If you encounter any issues or have suggestions for improvements, please open an issue on the [GitHub Issues page](https://github.com/yourusername/chess-like-game/issues).
+If you encounter any issues or have suggestions for improvements, please open an issue on the repository.
